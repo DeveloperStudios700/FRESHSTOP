@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Office Screen Control Panel</title>
+  <title>Screen Control Panel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Firebase v10 (MODULAR SDK) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -17,50 +16,49 @@
       projectId: "realtime-database-394c2",
       storageBucket: "realtime-database-394c2.firebasestorage.app",
       messagingSenderId: "430494425329",
-      appId: "1:430494425329:web:49b6a34269f0010eda8950",
-      measurementId: "G-FXN6271HHL"
+      appId: "1:430494425329:web:49b6a34269f0010eda8950"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const statusText = document.getElementById("status");
-    const toggleBtn = document.getElementById("toggleBtn");
+    const screens = ["Screen1", "Screen2", "Screen3"];
 
-    let currentState = true;
+    window.onload = () => {
+      screens.forEach((screen) => {
+        const status = document.getElementById(screen + "_status");
+        const btn = document.getElementById(screen + "_btn");
 
-    const enabledRef = ref(db, "OfficeScreens/enabled");
+        const screenRef = ref(db, "OfficeScreens/" + screen);
 
-    // 🔄 LIVE LISTENER
-    onValue(enabledRef, (snapshot) => {
-      currentState = snapshot.val();
+        let current = true;
 
-      if (currentState) {
-        statusText.innerText = "🟢 ENABLED";
-        toggleBtn.className = "btn on";
-        toggleBtn.innerText = "Disable Screens";
-      } else {
-        statusText.innerText = "🔴 DISABLED";
-        toggleBtn.className = "btn off";
-        toggleBtn.innerText = "Enable Screens";
-      }
-    });
+        onValue(screenRef, (snap) => {
+          current = snap.val();
 
-    // 🔘 TOGGLE BUTTON
-    window.toggleScreens = function () {
-      set(enabledRef, !currentState);
+          if (current) {
+            status.innerText = "🟢 ENABLED";
+            btn.className = "btn on";
+            btn.innerText = "Disable";
+          } else {
+            status.innerText = "🔴 DISABLED";
+            btn.className = "btn off";
+            btn.innerText = "Enable";
+          }
+        });
+
+        btn.onclick = () => {
+          set(screenRef, !current);
+        };
+      });
     };
   </script>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #0f172a, #020617);
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #020617, #0f172a);
       color: white;
       display: flex;
       justify-content: center;
@@ -69,39 +67,30 @@
     }
 
     .card {
-      background: rgba(30, 41, 59, 0.9);
-      backdrop-filter: blur(12px);
-      padding: 40px;
-      border-radius: 20px;
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 16px;
       width: 320px;
-      text-align: center;
       box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-      transition: 0.3s;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
     }
 
     h1 {
-      margin-bottom: 10px;
-      font-size: 24px;
+      text-align: center;
+      margin-bottom: 20px;
     }
 
-    #status {
-      margin: 20px 0;
-      font-size: 18px;
-      font-weight: bold;
+    .screen {
+      margin-bottom: 20px;
+      text-align: center;
     }
 
     .btn {
-      padding: 12px 20px;
+      padding: 10px;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: 0.3s;
       width: 100%;
+      margin-top: 5px;
     }
 
     .on {
@@ -109,17 +98,9 @@
       color: black;
     }
 
-    .on:hover {
-      background: #16a34a;
-    }
-
     .off {
       background: #ef4444;
       color: white;
-    }
-
-    .off:hover {
-      background: #dc2626;
     }
   </style>
 </head>
@@ -127,9 +108,26 @@
 <body>
 
 <div class="card">
-  <h1>🎮 Office Screens</h1>
-  <div id="status">Loading...</div>
-  <button id="toggleBtn" class="btn" onclick="toggleScreens()">Toggle</button>
+  <h1>🎮 Screen Control</h1>
+
+  <div class="screen">
+    <h3>Screen 1</h3>
+    <p id="Screen1_status">Loading...</p>
+    <button id="Screen1_btn" class="btn">Toggle</button>
+  </div>
+
+  <div class="screen">
+    <h3>Screen 2</h3>
+    <p id="Screen2_status">Loading...</p>
+    <button id="Screen2_btn" class="btn">Toggle</button>
+  </div>
+
+  <div class="screen">
+    <h3>Screen 3</h3>
+    <p id="Screen3_status">Loading...</p>
+    <button id="Screen3_btn" class="btn">Toggle</button>
+  </div>
+
 </div>
 
 </body>
